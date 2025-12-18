@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html manifest="offline.cache">
+<head>
+    <meta charset="UTF-8">
+    <title>PS4 13.02 Research Tool</title>
+    <style>
+        body { background-color: #000; color: #00ff00; font-family: monospace; padding: 20px; }
+        #status { font-size: 20px; color: #fff; }
+        .log { margin-top: 10px; border: 1px solid #333; padding: 10px; height: 200px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <div id="status">Status: Page Loaded...</div>
+    <p>Step 1: Wait for "Cache Complete" message.</p>
+    <p>Step 2: Bookmark this page.</p>
+    <p>Step 3: Disconnect Internet and open bookmark to test.</p>
+    <hr>
+    <div id="log" class="log">Initializing...</div>
+
+    <script>
+        const logDiv = document.getElementById('log');
+        const statusDiv = document.getElementById('status');
+        let heap = [];
+
+        function writeLog(msg) {
+            logDiv.innerHTML += "> " + msg + "<br>";
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        // نظام الكاش (Offline)
+        window.applicationCache.addEventListener('cached', () => {
+            statusDiv.innerText = "Status: CACHE COMPLETE! You can go offline.";
+            writeLog("Success: Page saved to system memory.");
+        }, false);
+
+        // كود الضغط على الذاكرة (Heap Stress)
+        function startFuzzing() {
+            statusDiv.innerText = "Status: FUZZING ACTIVE...";
+            try {
+                // محاولة إحداث تضارب في الذاكرة (Type Confusion)
+                let buffer = new ArrayBuffer(0x1000000);
+                heap.push(new Uint8Array(buffer).fill(0x41));
+                
+                let target = [1.1, 2.2];
+                target.length = 0x2000; // تلاعب بالطول
+                
+                writeLog("Memory Block Allocated: " + heap.length);
+                
+                // التكرار كل نصف ثانية
+                setTimeout(startFuzzing, 500);
+            } catch (e) {
+                writeLog("Error: " + e.message);
+                setTimeout(startFuzzing, 1000);
+            }
+        }
+
+        // تفعيل الكود بعد التأكد من التحميل
+        setTimeout(startFuzzing, 3000);
+    </script>
+</body>
+</html>
